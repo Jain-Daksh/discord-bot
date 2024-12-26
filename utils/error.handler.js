@@ -16,6 +16,10 @@ const errorHandler = {
     status: 406,
     error: err,
   }),
+  alreadyExist: (err) => ({
+    status: 409,
+    error: err,
+  })
 };
 
 module.exports = { errorHandler };
