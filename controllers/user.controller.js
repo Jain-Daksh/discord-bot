@@ -67,8 +67,8 @@ exports.get = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { id } = req.params; // Get the user ID from request params
-    const { username, password } = req.body; // Get data to update
+    const { id } = req.params;
+    const { username, password } = req.body;
 
     if (!id) {
       return res.status(400).json({
@@ -85,7 +85,6 @@ exports.update = async (req, res) => {
       });
     }
 
-    // Update user details
     if (username) user.username = username;
     if (password) user.password = await doHash(password, 12);
 
