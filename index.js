@@ -2,15 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 // const cors = require('cors');
+const { router } = require('./routes/index');
 
 dotenv.config();
 const app = express();
-const { router } = require('./routes/index');
+app.use(express.json());
 //db.js
 
 
 console.log('process.env.db', process.env.db)
 const url = process.env.db;
+app.use(router);
 
 const connectionParams = {
   useNewUrlParser: true,
@@ -23,6 +25,8 @@ mongoose.connect(url, connectionParams)
   .catch((err) => {
     console.error(`Error connecting to the database. n${err}`);
   })
+
+
 
 const PORT = process.env.SERVER_PORT || 3011;
 const server = app.listen(PORT, () => {
