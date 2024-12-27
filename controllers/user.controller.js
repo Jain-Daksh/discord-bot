@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.Model');
+const Subscription = require('../models/subscription.Model');
+
 const { ERROR_CODES } = require('../utils/error.handler');
 
 const { doHash } = require('../utils/hashing');
@@ -43,20 +45,49 @@ exports.create = async (req, res) => {
   }
 };
 
+// exports.get = async (req, res) => {
+//   try {
+//     const { username } = req.params;
+//     const user = await User.findOne(username).select('-password');
+
+//     if (!user) {
+//       res.send({
+//         status: ERROR_CODES.ERROR_CODES.notFound.status,
+//         message: ERROR_CODES.ERROR_CODES.notFound.error,
+//       });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       user,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server error',
+//     });
+//   }
+// };
+
 exports.get = async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id).select('-password');
+    const { username } = req.params;  // Retrieve username from the request parameters
+    console.log('username', username)
+    const user = await User.findOne({ username }).select('-password');  // Find user by username
+
+    const subscriptions = await Subscription.find({ userID: user._id });
 
     if (!user) {
-      res.send({
-        status: ERROR_CODES.ERROR_CODES.notFound.status,
+      return res.status(ERROR_CODES.ERROR_CODES.notFound.status).json({
+        success: false,
         message: ERROR_CODES.ERROR_CODES.notFound.error,
       });
     }
+
     res.status(200).json({
       success: true,
       user,
+      subscriptions
     });
   } catch (error) {
     console.error(error);
@@ -66,6 +97,7 @@ exports.get = async (req, res) => {
     });
   }
 };
+
 
 exports.update = async (req, res) => {
   try {
