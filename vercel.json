@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "env": {
+    "API_URL": "discord-fkkirqu3g-jaindakshs-projects-1037a62b.vercel.app"
+  }
+}
