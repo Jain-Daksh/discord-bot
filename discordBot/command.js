@@ -37,6 +37,38 @@ const registerCommands = async (clientId, token) => {
         },
       ],
     },
+    {
+      name: 'ppcreateservice',
+      description: 'Creates a new service with name, link, and fee',
+      options: [
+        {
+          name: 'servicename',
+          type: 3,
+          description: 'Name of the service',
+          required: true,
+        },
+        {
+          name: 'servicelink',
+          type: 3,
+          description: 'Link to the service',
+          required: true,
+        },
+        {
+          name: 'monthlyfee',
+          type: 3,
+          description: 'Monthly fee of the service',
+          required: true,
+        },
+        {
+          name: 'username',
+          type: 3,
+          description: 'username ',
+          required: true,
+        },
+
+      ],
+    }
+
   ];
 
   const rest = new REST({ version: '10' }).setToken(token);
