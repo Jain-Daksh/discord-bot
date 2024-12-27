@@ -45,35 +45,9 @@ exports.create = async (req, res) => {
   }
 };
 
-// exports.get = async (req, res) => {
-//   try {
-//     const { username } = req.params;
-//     const user = await User.findOne(username).select('-password');
-
-//     if (!user) {
-//       res.send({
-//         status: ERROR_CODES.ERROR_CODES.notFound.status,
-//         message: ERROR_CODES.ERROR_CODES.notFound.error,
-//       });
-//     }
-//     res.status(200).json({
-//       success: true,
-//       user,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Server error',
-//     });
-//   }
-// };
-
 exports.get = async (req, res) => {
   try {
-    const { username } = req.params;  // Retrieve username from the request parameters
-    console.log('username', username)
-    const user = await User.findOne({ username }).select('-password');  // Find user by username
+    const { username } = req.params; const user = await User.findOne({ username }).select('-password');  // Find user by username
 
     const subscriptions = await Subscription.find({ userID: user._id });
 
