@@ -1,16 +1,14 @@
-
-
 const router = require('express').Router();
 const User = require('../controllers/user.controller');
-
+const { isAuthenticated } = require('../utils/jwt');
 
 module.exports = (app) => {
-  console.log('came')
+  router.get('/', isAuthenticated, User.getAll);
   router.post('/', User.create);
-  // router.get('/:id', User.show);
-  router.put('/:id', User.update);
-  // router.delete('/:id', validation.deleteValidation, User.delete);
-  // router.get('/:id/filter-index/', User.filter_index);
-  app.use('/api/users', router);
 
+  router.get('/:id', isAuthenticated, User.get);
+  router.put('/:id', isAuthenticated, User.update);
+  router.delete('/:id', isAuthenticated, User.delete);
+
+  app.use('/api/users', router);
 };
