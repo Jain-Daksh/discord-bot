@@ -4,7 +4,7 @@ const { registerCommands } = require('./command');
 
 
 const apiUrl = process.env.API_URL;
-
+const ClientToken = process.env.client_token
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -152,8 +152,8 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 
-const startBot = async (token, clientId) => {
-  await registerCommands('1321901989071687680', process.env.token);
+const startBot = async () => {
+  await registerCommands(ClientToken, process.env.token);
 
   client
     .login(process.env.token)
