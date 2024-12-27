@@ -7,13 +7,14 @@ exports.create = async (req, res) => {
 
   try {
     const user = await User.findOne({ username });
-    const userID = user.id
     if (!user) {
       return res.status(ERROR_CODES.NOT_FOUND.status).json({
         success: false,
         message: ERROR_CODES.NOT_FOUND.error,
       });
     }
+    const userID = user.id
+
     const existingSubscription = await Subscription.findOne({
       userID,
       isExpired: false,
