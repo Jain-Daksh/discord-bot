@@ -1,6 +1,10 @@
 const { default: axios } = require('axios');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
-const { registerCommands } = require('./command'); // Import command registration
+const { registerCommands } = require('./command');
+
+
+const apiUrl = process.env.API_URL;
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -43,7 +47,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3011/api/users', {
+      const response = await axios.post(`${apiUrl}/users`, {
         username,
         email,
         password,
@@ -70,7 +74,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'ppgetuser') {
     const username = interaction.options.getString('username');
     try {
-      const response = await axios.get(`http://localhost:3011/api/users/${username}`);
+      const response = await axios.get(`${apiUrl}/users/${username}`);
 
 
       if (response.data.success) {
@@ -124,7 +128,7 @@ client.on('interactionCreate', async (interaction) => {
         return await interaction.reply('Please provide valid service details.');
       }
 
-      const response = await axios.post('http://localhost:3011/api/subscriptions', {
+      const response = await axios.post(`${apiUrl}/subscriptions`, {
         serviceName,
         serviceLink,
         username,
