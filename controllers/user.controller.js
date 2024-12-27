@@ -1,23 +1,27 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.Model');
-const errorHandler = require('../utils/error.handler');
-const { doHash, doHashValidation, hmacProcess } = require('../utils/hashing');
-const serialize = require('../serializers/user.serializer');
+const { ERROR_CODES } = require('../utils/error.handler');
 
+const { doHash } = require('../utils/hashing');
 
 exports.create = async (req, res) => {
-  console.log(req.body)
   const { email, password, username } = req.body;
   try {
-
     const existingUser = await User.findOne({ email });
 
-    if (existingUser) {
-      res.send(({
-        status: errorHandler.errorHandler.alreadyExist.status,
-        message: errorHandler.errorHandler.alreadyExist.error,
-      }));
+    const existingUserName = await User.findOne({
+      username,
+    });
 
+    if (existingUserName || existingUser) {
+      return res
+        .status(ERROR_CODES.ERROR_CODES?.alreadyExist?.status || 400)
+        .json({
+          success: false,
+          message:
+            ERROR_CODES.ERROR_CODES?.alreadyExist?.error ||
+            'Conflict: User already exists',
+        });
     }
 
     const hashedPassword = await doHash(password, 12);
@@ -27,7 +31,6 @@ exports.create = async (req, res) => {
       email,
       password: hashedPassword,
     });
-    console.log('user', newUser)
     const result = await newUser.save();
     result.password = undefined;
     res.status(201).json({
@@ -44,17 +47,17 @@ exports.get = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id).select('-password');
+
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
+      res.send({
+        status: ERROR_CODES.ERROR_CODES.notFound.status,
+        message: ERROR_CODES.ERROR_CODES.notFound.error,
       });
     }
     res.status(200).json({
       success: true,
       user,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -63,7 +66,6 @@ exports.get = async (req, res) => {
     });
   }
 };
-
 
 exports.update = async (req, res) => {
   try {
@@ -79,9 +81,20 @@ exports.update = async (req, res) => {
 
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
+      return res.send({
+        status: ERROR_CODES.ERROR_CODES.notFound.status,
+        message: ERROR_CODES.ERROR_CODES.notFound.error,
+      });
+    }
+
+    /// checking if username which user has given is been used or not if in use give error
+
+    const existingUserName = await User.findOne({ username });
+
+    if (existingUserName) {
+      res.send({
+        status: ERROR_CODES.ERROR_CODES.alreadyExist.status,
+        message: ERROR_CODES.ERROR_CODES.alreadyExist.error,
       });
     }
 
@@ -89,7 +102,7 @@ exports.update = async (req, res) => {
     if (password) user.password = await doHash(password, 12);
 
     const updatedUser = await user.save();
-    updatedUser.password = undefined; // Exclude password in the response
+    updatedUser.password = undefined;
 
     res.status(200).json({
       success: true,
@@ -105,5 +118,51 @@ exports.update = async (req, res) => {
   }
 };
 
+exports.delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.send({
+        status: ERROR_CODES.ERROR_CODES.badRequest.status,
+        message: ERROR_CODES.ERROR_CODES.badRequest,
+      });
+    }
 
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
+    await user.remove();
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
