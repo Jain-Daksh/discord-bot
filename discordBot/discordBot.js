@@ -9,17 +9,14 @@ const client = new Client({
   ],
 });
 
-// Bot event when ready
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
-// Handle messages
 client.on('messageCreate', (message) => {
   console.log(message.content, 'message');
 });
 
-// Respond to user with "hi from bot"
 client.on('messageCreate', (message) => {
   if (message.author.bot) return;
   message.reply({
@@ -27,28 +24,25 @@ client.on('messageCreate', (message) => {
   });
 });
 
-// Handle user creation command
-client.on('messageCreate', async (message) => {
-  if (message.content.startsWith('ppcreateuser')) {
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+
+  const { commandName } = interaction;
+
+  if (commandName === 'ping') {
+    await interaction.reply('Pong!');
+  }
+
+  if (commandName === 'createuser') {
+    const username = interaction.options.getString('username');
+    const email = interaction.options.getString('email');
+    const password = interaction.options.getString('password');
+
+    if (!username || !email || !password) {
+      return interaction.reply('Invalid format! You must provide username, email, and password.');
+    }
+
     try {
-      const args = message.content.split(' ').slice(1);
-      const userData = {};
-
-      args.forEach((arg) => {
-        const [key, value] = arg.split(':');
-        if (key && value) {
-          userData[key.trim()] = value.trim().replace(/"/g, '');
-        }
-      });
-
-      const { username, email, password } = userData;
-
-      if (!username || !email || !password) {
-        return message.reply(
-          'Invalid format! Use `ppcreateuser username:<name> email:<email> password:<password>`'
-        );
-      }
-
       const response = await axios.post('http://localhost:3011/api/users', {
         username,
         email,
@@ -56,36 +50,71 @@ client.on('messageCreate', async (message) => {
       });
 
       if (response.data.success) {
-        message.reply(
+        await interaction.reply(
           `User created successfully! Username: ${response.data.result.username}, Email: ${response.data.result.email}`
         );
       } else {
-        message.reply(`Failed to create user: ${response.data.message}`);
+        await interaction.reply(`Failed to create user: ${response.data.message}`);
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        message.reply(`Failed to create user: ${error.response.data.message}`);
+        await interaction.reply(`Failed to create user: ${error.response.data.message}`);
       } else {
         console.error('Error creating user:', error.message);
-        message.reply('An error occurred while creating the user. Please try again.');
+        await interaction.reply('An error occurred while creating the user. Please try again.');
       }
     }
   }
 
-  if (message.content.startsWith('create')) {
-    const url = message.content.split('create')[1];
-    return message.reply({
-      content: "creating" + url,
-    });
+
+  if (commandName === 'ppgetuser') {
+    const username = interaction.options.getString('username');
+    try {
+      const response = await axios.get(`http://localhost:3011/api/users/${username}`);
+
+
+      if (response.data.success) {
+        const user = response.data.user;
+        const subscriptions = response.data.subscriptions;
+
+        let subscriptionDetails = '';
+        if (subscriptions && subscriptions.length > 0) {
+          subscriptions.forEach((subscription, index) => {
+            subscriptionDetails += `
+  **Subscription ${index + 1}:**
+   Service Name: ${subscription.serviceName}
+   Service Link: ${subscription.serviceLink}
+   Monthly Fee: $${subscription.monthlyFee}
+   Expiry Date: ${subscription.expiryDate ? new Date(subscription.expiryDate).toLocaleDateString() : 'N/A'}
+  
+  `;
+          });
+        } else {
+          subscriptionDetails = 'No active subscriptions found for this user.';
+        }
+
+        await interaction.reply(`
+  **User Data:**
+   Username: ${user.username}
+   Email: ${user.email}
+
+
+  **Subscription  Data:**
+  ${subscriptionDetails}
+  `);
+      } else {
+        await interaction.reply(`User not found: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error.message);
+      await interaction.reply('An error occurred while fetching the user data. Please try again.');
+    }
   }
+
+
 });
 
-// Handle interactions (like slash commands)
-client.on("interactionCreate", (interaction) => {
-  interaction.reply("Pong!");
-});
 
-// Function to start the bot and login
 const startBot = async (token, clientId) => {
   await registerCommands('1321901989071687680', process.env.token);
 
