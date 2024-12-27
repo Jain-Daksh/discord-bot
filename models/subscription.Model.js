@@ -6,6 +6,8 @@ const subscriptionSchema = new mongoose.Schema({
   monthlyFee: { type: Number, required: true },
   startDate: { type: Date, default: Date.now },
   userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  expiryDate: { type: Date },
+  isExpired: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('Subscription', subscriptionSchema);
