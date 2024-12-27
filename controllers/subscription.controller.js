@@ -3,11 +3,11 @@ const { ERROR_CODES } = require('../utils/error.handler');
 const User = require('../models/user.Model');
 
 exports.create = async (req, res) => {
-  const { serviceName, serviceLink, monthlyFee, userID } = req.body;
+  const { serviceName, serviceLink, monthlyFee, username } = req.body;
 
   try {
-    const user = await User.findById(userID);
-
+    const user = await User.findOne({ username });
+    const userID = user.id
     if (!user) {
       return res.status(ERROR_CODES.NOT_FOUND.status).json({
         success: false,
