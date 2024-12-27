@@ -112,6 +112,39 @@ client.on('interactionCreate', async (interaction) => {
   }
 
 
+  if (commandName === 'ppcreateservice') {
+    const serviceName = interaction.options.getString('servicename');
+    const serviceLink = interaction.options.getString('servicelink');
+    const monthlyFee = interaction.options.getString('monthlyfee');
+    const username = interaction.options.getString('username');
+
+
+    try {
+      if (!serviceName || !serviceLink || !monthlyFee || !username) {
+        return await interaction.reply('Please provide valid service details.');
+      }
+
+      const response = await axios.post('http://localhost:3011/api/subscriptions', {
+        serviceName,
+        serviceLink,
+        username,
+        monthlyFee: parseFloat(monthlyFee.replace('$', '')),
+      });
+
+      if (response.data.success) {
+        await interaction.reply(`Service created successfully! \nService Name: ${serviceName}\nService Link: ${serviceLink}\nMonthly Fee: ${monthlyFee}`);
+      } else {
+        await interaction.reply(`Failed to create service: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Error creating service:', error.message);
+      await interaction.reply('An error occurred while creating the service. Please try again.');
+    }
+  }
+
+
+
+
 });
 
 
