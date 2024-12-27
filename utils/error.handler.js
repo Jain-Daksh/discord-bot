@@ -1,26 +1,27 @@
-const errorHandler = {
-  internalServerError: (err) => ({
-    status: 500,
-    error: err || {},
-  }),
-  notFound: (err) => ({
-    status: 404,
-    error: err,
-    message: 'No user of this id',
-  }),
-  badRequest: (err) => ({
-    status: 400,
-    error: err,
-  }),
-  notAccepted: (err) => ({
-    status: 406,
-    error: err,
-  }),
-  alreadyExist: (err) => ({
+const ERROR_CODES = {
+  ALREADY_EXIST: {
     status: 409,
-    error: err,
-  })
+    error: 'User already exists',
+  },
+  INTERNAL_SERVER_ERROR: {
+    status: 500,
+    error: 'An unexpected error occurred',
+  },
+  NOT_FOUND: {
+    status: 404,
+    error: 'Resource not found',
+  },
+  UNAUTHORIZED: {
+    status: 401,
+    error: 'Unauthorized access',
+  },
+  BAD_REQUEST: {
+    status: 400,
+    error: 'Invalid input or request',
+  },
 };
 
-module.exports = { errorHandler };
-
+// Export the error codes
+module.exports = {
+  ERROR_CODES,
+};
