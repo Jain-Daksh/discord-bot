@@ -6,6 +6,12 @@
       "use": "@vercel/node"
     }
   ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
   "env": {
     "API_URL": "discord-fkkirqu3g-jaindakshs-projects-1037a62b.vercel.app"
   }
