@@ -40,17 +40,15 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'createuser') {
     const username = interaction.options.getString('username');
     const email = interaction.options.getString('email');
-    const password = interaction.options.getString('password');
 
-    if (!username || !email || !password) {
-      return interaction.reply('Invalid format! You must provide username, email, and password.');
+    if (!username || !email) {
+      return interaction.reply('Invalid format! You must provide username, email');
     }
 
     try {
       const response = await axios.post(`${apiUrl}/users`, {
         username,
         email,
-        password,
       });
 
       if (response.data.success) {
