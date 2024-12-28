@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.Model');
 const Subscription = require('../models/subscription.Model');
-
+const { v4: uuidv4 } = require('uuid');
 const { ERROR_CODES } = require('../utils/error.handler');
 
 const { doHash } = require('../utils/hashing');
@@ -25,8 +25,14 @@ exports.create = async (req, res) => {
             'Conflict: User already exists',
         });
     }
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await doHash(password, 12);
+    } else {
+      const randomPassword = uuidv4();
+      hashedPassword = await doHash(randomPassword, 12);
+    }
 
-    const hashedPassword = await doHash(password, 12);
 
     const newUser = new User({
       username,
