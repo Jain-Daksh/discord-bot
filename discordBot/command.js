@@ -23,6 +23,7 @@ const registerCommands = async (clientId, token) => {
           required: true,
         },
 
+
       ],
     },
     {
