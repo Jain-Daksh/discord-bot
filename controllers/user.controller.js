@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
       result,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
