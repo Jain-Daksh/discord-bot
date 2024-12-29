@@ -1,5 +1,5 @@
 const User = require('../models/user.Model');
-const { doHashValidation, hmacProcess } = require('../utils/hashing');
+const { doHashValidation } = require('../utils/hashing');
 const { generateToken } = require('../utils/jwt');
 
 
